@@ -1,4 +1,5 @@
-﻿@{
+﻿@model joseph_website.Models.User
+@{
 	ViewData["Title"] = "Home Page";
 }
 
@@ -6,3 +7,19 @@
 	<h1 class="display-4">CONTACT</h1>
 	<p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<form method="post">
+	Voornaam: <input type="text" name="firstName" />
+	@Html.ValidationMessageFor(m => m.FirstName)
+	Achternaam: <input type="text" name="lastName" />
+	@Html.ValidationMessageFor(m => m.LastName)
+	Achternaam: <input type="text" name="email" />
+	@Html.ValidationMessageFor(m => m.Email)
+	Achternaam: <input type="text" name="message" />
+	<input type="submit" value="save" />
+</form>
+
+@if (Model != null)
+{
+<p>Hallo: @Model.FirstName | @Model.LastName | @Model.Email | @Model.Message</p>
+}

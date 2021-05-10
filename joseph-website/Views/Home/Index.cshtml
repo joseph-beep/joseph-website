@@ -1,8 +1,18 @@
-﻿@{
+﻿@using joseph_website.Controllers;
+@using joseph_website.Controllers.Database;
+@model List<Person>
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
+    @foreach (Person person in Model)
+	{
+        <p>@person.FirstName @person.LastName</p>
+	}
+
+    <button onclick="@HomeController.DoSomething();">Press me to Print Hello world!</button>
+
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
