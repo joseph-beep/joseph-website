@@ -14,6 +14,9 @@ namespace joseph_website.Controllers
 {
     public class HomeController : Controller
     {
+        //private const string CONNECTION_STRING = "Server=172.16.160.21;Port=3306;Database=110737;Uid=lgg;Pwd=0P%Y9fI2GdO#;";
+        private const string CONNECTION_STRING = "Server=informatica.st-maartenscollege.nl;Port=3306;Database=110737;Uid=110737;Pwd=infsql2021;";
+
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -28,43 +31,31 @@ namespace joseph_website.Controllers
             return View(persons);
         }
 
-        public List<Person> GetPersons()
+        [Route("person/{id}")]
+        public IActionResult Person(string id)
         {
-            // stel in waar de database gevonden kan worden
-            //string connectionString = "Server=172.16.160.21;Port=3306;Database=110737;Uid=lgg;Pwd=0P%Y9fI2GdO#;";
-            string connectionString = "Server=informatica.st-maartenscollege.nl;Port=3306;Database=110737;Uid=110737;Pwd=infsql2021;";
+            return View(GetPersons($"SELECT * FROM `persons` WHERE id = {id}")[0]);
+        }
 
-            // maak een lege lijst waar we de namen in gaan opslaan
+        public List<Person> GetPersons(string sqlCommand = "SELECT * FROM `persons`")
+        {
             List<Person> persons = new List<Person>();
 
-            // verbinding maken met de database
-            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
             {
-                // verbinding openen
                 conn.Open();
 
-                MySqlCommand insertCommand = new MySqlCommand("INSERT INTO `test-table` (`firstName`, `lastName`, `age`, `isDead`) VALUES ('Julius', 'Caesar', '400', '1');", conn);
-                insertCommand.ExecuteNonQuery();
+                MySqlCommand cmd = new MySqlCommand(sqlCommand, conn);
 
-                // SQL query die we willen uitvoeren
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM `test-table`", conn);
-
-                // resultaat van de query lezen
                 using (var reader = cmd.ExecuteReader())
                 {
-                    // elke keer een regel (of eigenlijk: database rij) lezen
                     while (reader.Read())
                     {
-                        // selecteer de kolommen die je wil lezen. In dit geval kiezen we de kolom "naam"
-                        Person currentPerson = new Person(reader["firstName"].ToString(), reader["lastName"].ToString(), Convert.ToInt32(reader["age"]), (bool)reader["isDead"]);
-
-                        // voeg de naam toe aan de lijst met namen
-                        persons.Add(currentPerson);
+                        persons.Add(new Person(Convert.ToInt32(reader["id"]), reader["firstName"].ToString(), reader["lastName"].ToString(), Convert.ToInt32(reader["age"]), (string)reader["isDead"]));
                     }
                 }
             }
 
-            // return de lijst met namen
             return persons;
         }
 
@@ -76,7 +67,7 @@ namespace joseph_website.Controllers
             {
                 conn.Open();
 
-                MySqlCommand insertCommand = new MySqlCommand("INSERT INTO `test-table` (`firstName`, `lastName`, `age`, `isDead`) VALUES ('Marcus', 'Aurelius', '999', '0');", conn);
+                MySqlCommand insertCommand = new MySqlCommand("INSERT INTO `persons` (`firstName`, `lastName`, `age`, `isDead`) VALUES ('Marcus', 'Aurelius', '999', '0');", conn);
                 insertCommand.ExecuteNonQuery();
             }
 
