@@ -1,27 +1,26 @@
 ﻿using joseph_website.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using MySql.Data;
-using MySql.Data.MySqlClient;
-using joseph_website.Controllers.Database;
 
 namespace joseph_website.Controllers
 {
     public class HomeController : Controller
     {
-        //private const string CONNECTION_STRING = "Server=172.16.160.21;Port=3306;Database=110737;Uid=lgg;Pwd=0P%Y9fI2GdO#;";
-        private const string CONNECTION_STRING = "Server=informatica.st-maartenscollege.nl;Port=3306;Database=110737;Uid=110737;Pwd=infsql2021;";
+        ////private const string CONNECTION_STRING = "Server=172.16.160.21;Port=3306;Database=110737;Uid=lgg;Pwd=0P%Y9fI2GdO#;";
+        //public const string CONNECTION_STRING = "Server=informatica.st-maartenscollege.nl;Port=3306;Database=110737;Uid=110737;Pwd=infsql2021;";
 
         private readonly ILogger<HomeController> _logger;
+        private readonly Settings _settings;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IOptions<Settings> settings)
         {
             _logger = logger;
+            _settings = settings.Value;
         }
 
         public IActionResult Index()
@@ -41,20 +40,20 @@ namespace joseph_website.Controllers
         {
             List<Person> persons = new List<Person>();
 
-            using (MySqlConnection conn = new MySqlConnection(CONNECTION_STRING))
-            {
-                conn.Open();
+            //using (MySqlConnection conn = new MySqlConnection(_settings.ConnectionString))
+            //{
+            //    conn.Open();
 
-                MySqlCommand cmd = new MySqlCommand(sqlCommand, conn);
+            //    MySqlCommand cmd = new MySqlCommand(sqlCommand, conn);
 
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        persons.Add(new Person(Convert.ToInt32(reader["id"]), reader["firstName"].ToString(), reader["lastName"].ToString(), Convert.ToInt32(reader["age"]), (string)reader["isDead"]));
-                    }
-                }
-            }
+            //    using (var reader = cmd.ExecuteReader())
+            //    {
+            //        while (reader.Read())
+            //        {
+            //            persons.Add(new Person(Convert.ToInt32(reader["id"]), reader["firstName"].ToString(), reader["lastName"].ToString(), Convert.ToInt32(reader["age"]), (string)reader["isDead"]));
+            //        }
+            //    }
+            //}
 
             return persons;
         }

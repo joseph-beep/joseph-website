@@ -1,12 +1,13 @@
+using joseph_website.Controllers;
+using joseph_website.Data;
+using joseph_website.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace joseph_website
 {
@@ -22,6 +23,24 @@ namespace joseph_website
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<Settings>(Configuration.GetSection("Configuration"));
+
+            // Replace with your server version and type.
+            // Use 'MariaDbServerVersion' for MariaDB.
+            // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
+            // For common usages, see pull request #1233.
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
+
+            // Replace 'YourDbContext' with the name of your own DbContext derived class.
+            services.AddDbContext<WebsiteContext>(
+                dbContextOptions => dbContextOptions
+                    .UseMySql(Configuration.GetSection("Configuration").GetSection("ConnectionString").Value, serverVersion)
+                    .EnableSensitiveDataLogging() // <-- These two calls are optional but help
+                    .EnableDetailedErrors()       // <-- with debugging (remove for production).
+            );
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
             services.AddDistributedMemoryCache();
 
             services.AddSession(options =>
